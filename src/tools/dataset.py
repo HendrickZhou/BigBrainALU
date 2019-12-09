@@ -14,24 +14,18 @@ def input_fn(data_dir,
     batch_file_names = get_files_with_extension(data_dir, DATASET_EXT)
     dataset = tf.data.Dataset.from_tensor_slices(batch_file_names)
     # apply the dataset parsing function
-    dataset.map(lambda x : tf.py_function(func=parse_file_fn, inp=[x], Tout=tf.string), num_parallel_calls=tf.data.experimental.AUTOTUNE)
-
+    dataset = dataset.map(lambda x : tf.py_function(func=parse_file_fn, inp=[x], Tout=tf.string), num_parallel_calls=tf.data.experimental.AUTOTUNE)
+    dataset = dataset.batch(2)
+    dataset = dataset.prefetch(2)
     return dataset
 
 
-def optimize(dataset):
-    """
-    optimazatio configs for dataset
-    """
-    dataset.batch(10)
-    return dataset
 
 def parse_filename_to_data(filename):
     """
     convert filename to dict of data and label
     """
-    import pdb; pdb.set_trace()
-    with open(filename, "wb") as f: 
+    with open(filename, "rb") as f: 
         batch = pickle.load(f)
     return list(batch.values())
 
