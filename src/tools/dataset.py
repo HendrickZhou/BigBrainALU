@@ -13,7 +13,7 @@ def input_fn(data_dir,
     # relative path of dataset batch files
     batch_file_names = get_files_with_extension(data_dir, DATASET_EXT)
     dataset = tf.data.Dataset.from_tensor_slices(batch_file_names)
-    dataset = dataset.shuffle(len(batch_file_names))
+    dataset = dataset.shuffle(len(batch_file_names)).repeat()
     # apply the dataset parsing function
     result = dataset.map(lambda x : tf.py_function(func=parse_file_fn, inp=[x], Tout=[tf.uint8, tf.uint8]), num_parallel_calls=tf.data.experimental.AUTOTUNE)
     result = result.batch(3).cache().prefetch(1)
