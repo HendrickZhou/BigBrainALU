@@ -16,11 +16,11 @@ default project/src/tools/utils.py dirctory
 project_path = pathlib.Path(__file__).parent.parent.parent
 
 def default_dataset_path():
-    "get the default path of our dataset"
+    """get the default path of our dataset"""
     return project_path / "dataset"
  
 def exam_path(dirctory):
-    "check if a path is valid in the system"
+    """check if a path is valid in the system"""
     pass
 
 def get_files_with_extension(directory, extension):
@@ -35,7 +35,7 @@ def get_files_with_extension(directory, extension):
 
    
 def check_dataset():
-    "check if the none-default dataset provided is valid"
+    """ if the none-default dataset provided is valid"""
     pass
 
 

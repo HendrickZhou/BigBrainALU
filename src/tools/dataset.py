@@ -1,3 +1,4 @@
+import tensorflow as tf
 import numpy as np
 import pickle
 import sys, os
@@ -6,20 +7,52 @@ from tools.utils import *
 DATASET_EXT = "batch"
 default_path = default_dataset_path()
 
-def extract_batches(path = default_path):
-    batch_names = get_files_with_extension(path, DATASET_EXT)
-    for name in batch_names:
-        data, label = extract_single_batch(name)
-        print(data[:10])
-        print(label[:10])
+def input_fn(data_dir,
+             drop_remainder = None,
+             *args):
+    # relative path of dataset batch files
+    batch_file_names = get_files_with_extension(data_dir, DATASET_EXT)
+    dataset = tf.data.Dataset.from_tensor_slices(batch_file_names)
+    # apply the dataset parsing function
+    dataset.map(lambda x : tf.py_function(func=parse_file_fn, inp=[x], Tout=tf.string), num_parallel_calls=tf.data.experimental.AUTOTUNE)
 
-def extract_single_batch(name):
-    with open(name, "rb") as f:
+    return dataset
+
+
+def optimize(dataset):
+    """
+    optimazatio configs for dataset
+    """
+    dataset.batch(10)
+    return dataset
+
+def parse_filename_to_data(filename):
+    """
+    convert filename to dict of data and label
+    """
+    import pdb; pdb.set_trace()
+    with open(filename, "wb") as f: 
         batch = pickle.load(f)
-    data = batch['data']
-    label = batch['label']
+    return list(batch.values())
+
+def preprocess(data, label):
+    """
+    preprocess datas
+    """
     return data, label
 
+def parse_file_fn(ds_elem) -> str:
+    """
+    The union preprocessing functions,
+    directly used in dataset.map() function
+    """
+    ds_elem_str = ds_elem.numpy().decode('utf-8')
+    return preprocess(*parse_filename_to_data(ds_elem_str))
 
+    
 if __name__ == "__main__":
-    extract_batches()
+    print("starting running")
+    dataset = input_fn(default_path)
+    for d in dataset:
+        print(d)
+    print("done running")
