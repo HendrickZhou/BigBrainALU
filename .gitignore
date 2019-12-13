@@ -1,5 +1,8 @@
 __pycache__/
 *.py[cod]
+*.py.swp
 /logdir
+
+*.csv
 
 .DS_Store

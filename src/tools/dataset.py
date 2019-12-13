@@ -16,9 +16,8 @@ def input_fn(data_dir,
     dataset = dataset.shuffle(len(batch_file_names)).repeat()
     # apply the dataset parsing function
     result = dataset.map(lambda x : tf.py_function(func=parse_file_fn, inp=[x], Tout=[tf.uint8, tf.uint8]), num_parallel_calls=tf.data.experimental.AUTOTUNE)
-    result = result.batch(3).cache().prefetch(1)
+    result = result.cache().prefetch(1)
     return result
-
 
 def parse_filename_to_data(filename):
     """
@@ -26,7 +25,9 @@ def parse_filename_to_data(filename):
     """
     with open(filename, "rb") as f: 
         batch = pickle.load(f)
-    return list(batch.values())
+    data = batch["data"]
+    label = batch['label'][:,0]
+    return data,label
 
 def preprocess(data, label):
     """
@@ -45,6 +46,10 @@ def parse_file_fn(ds_elem: tf.Tensor) -> str:
 if __name__ == "__main__":
     print("starting running")
     dataset = input_fn(default_path)
-    for d in dataset:
-        print(d)
+    def extract_dataset(dataset):
+        for data, label in dataset:
+            tf.print(label.shape, output_stream=sys.stdout)
+            tf.print(label.shape, output_stream=sys.stdout)
+
+    extract_dataset(dataset)
     print("done running")

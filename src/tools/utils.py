@@ -17,7 +17,7 @@ project_path = pathlib.Path(__file__).parent.parent.parent
 
 def default_dataset_path():
     """get the default path of our dataset"""
-    return project_path / "dataset"
+    return project_path / "dataset6"
  
 def exam_path(dirctory):
     """check if a path is valid in the system"""
