@@ -23,6 +23,8 @@ class Dataset():
     def __iter__(self):
         """
         only support generating the whole table now
+        If use this on tf.dataset.from_generator, plz at least suffle something
+        use ds.shuffle(cache = 1000)
         """
         number, ops = self.alu.gen_range()
         arr = lambda x : np.array(x, dtype = "uint8")
@@ -34,7 +36,7 @@ class Dataset():
 
     def __call__(self, form = "csv", batch_size = 1000):
         if form is "csv":
-            self.path = self.path + "dataset_csv/"
+            self.path = self.path / "dataset_csv/"
             self.filename = "alu_{}.csv".format(self.data_bits)
             self._csv()
 
@@ -96,7 +98,7 @@ class Dataset():
         data_arr = np.array(datas, dtype='uint8').reshape((total_size, data_dim))
         label_arr = np.array(labels, dtype = 'uint8').reshape((total_size, label_dim))
         df = pd.DataFrame(np.hstack((data_arr, label_arr)))
-        df.to_csv(self.path + self.filename, header=False, index=False)
+        df.to_csv(self.path / self.filename, header=False, index=False)
 
     def _get_data_label(self, A, B, op):
         """
@@ -115,8 +117,11 @@ if __name__ == '__main__':
     script_path = os.path.abspath(__file__)
     project_dir = script_path[:script_path.rfind("src")]
     output_path = project_dir + "dataset/"
+    # import pathlib
+    # project_path = pathlib.Path(__file__).parent.parent.parent
+    # output_path = project_path / "dataset"
     # ds = Dataset(6, "ALU-6-14_batch", output_path)
-    ds = Dataset(8, output_path)
+    ds = Dataset(4, output_path)
     ds()
     # for data, label in iter(ds):
     #     print(data)
