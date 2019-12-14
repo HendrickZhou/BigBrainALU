@@ -9,7 +9,7 @@ class Dataset():
     def __init__(self, data_bits, path, label_bit_msk=None):
         if label_bit_msk is None:
             label_bit_msk = [True for _ in range(data_bits)]
-        elif(len(label_bits_msk) >= data_bits):
+        elif(len(label_bit_msk) > data_bits):
             raise Exception("unsupported label bit mask length")
         self.path = path
         self.data_bits = data_bits
@@ -17,7 +17,7 @@ class Dataset():
         
         self.alu = ALU(self.data_bits)
         self.data_dim = self.alu.data_dim
-        self.label_dim = min(self.alu.label_dim, len(self.label_bit_msk))
+        self.label_dim = min(self.alu.label_dim, sum(self.label_bit_msk))
         self.filename = str()
 
     def __iter__(self):
@@ -36,7 +36,7 @@ class Dataset():
 
     def __call__(self, form = "csv", batch_size = 1000):
         if form is "csv":
-            self.path = self.path / "dataset_csv/"
+            self.path = self.path + "dataset_csv/"
             self.filename = "alu_{}.csv".format(self.data_bits)
             self._csv()
 
@@ -82,7 +82,7 @@ class Dataset():
         datas = []
         labels = []
         data_dim = self.alu.data_dim
-        label_dim = self.alu.label_dim
+        label_dim = self.label_dim
         total_size = len(ops) * len(number)**2
         i = 0
 
@@ -98,7 +98,7 @@ class Dataset():
         data_arr = np.array(datas, dtype='uint8').reshape((total_size, data_dim))
         label_arr = np.array(labels, dtype = 'uint8').reshape((total_size, label_dim))
         df = pd.DataFrame(np.hstack((data_arr, label_arr)))
-        df.to_csv(self.path / self.filename, header=False, index=False)
+        df.to_csv(self.path + self.filename, header=False, index=False)
 
     def _get_data_label(self, A, B, op):
         """
@@ -121,7 +121,7 @@ if __name__ == '__main__':
     # project_path = pathlib.Path(__file__).parent.parent.parent
     # output_path = project_path / "dataset"
     # ds = Dataset(6, "ALU-6-14_batch", output_path)
-    ds = Dataset(4, output_path)
+    ds = Dataset(6, output_path, [True for i in range(6)])
     ds()
     # for data, label in iter(ds):
     #     print(data)

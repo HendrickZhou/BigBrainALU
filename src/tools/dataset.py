@@ -70,7 +70,7 @@ def preprocess(data, label):
 if __name__ == "__main__":
     print("starting running")
     # They fucking don't support path object, you have to convert it to string first
-    dataset = input_fn(str(default_path / "alu_6.csv"), 16, [True for i in range(5)] + [False])
+    dataset = input_fn(str(default_path / "alu_6.csv"), 16, [True] + [False for i in range(5)])
     def extract_dataset(dataset):
         for data, label in dataset:
             tf.print(data, output_stream=sys.stdout)
