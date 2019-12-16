@@ -26,9 +26,9 @@ def toy_net(layers, batch_size = 1):
 # @tf.function
 def train(model, dataset, idx):
     cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_dir(idx)+checkpoint_path,
-                                                     monitor = "val_acc",
+                                                     monitor = "acc",
                                                      verbose=1,
-                                                     save_best_only = True,
+                                                     #save_best_only = True,
                                                      save_weights_only=True,
                                                      mode = "auto",
                                                      save_freq=100)
@@ -53,19 +53,22 @@ def train(model, dataset, idx):
     #     gradients = tape.gradient(loss, model.trainable_variable)
     #     optimizer.apply_gradients(zip(gradients, model.trainable_variables))
 
-
-
-
+def new_ds():
+    dataset = input_fn(str(default_path / "alu_6.csv"), 16, [True for i in range(1)] + [False for i in range(4)])
+    return dataset
 
 layers = [55, 50, 40, 35, 30, 25, 10, 15]
-
-model = toy_net(layers)
-dataset = input_fn(str(default_path / "alu_6.csv"), 16, [True for i in range(1)] + [False for i in range(4)])
-
-idx = 1
 import os
-if not os.path.exists(checkpoint_dir(idx)):
-    os.makedirs(checkpoint_dir(idx))
-if not os.path.exists(tensorboard_path(idx)):
-    os.makedirs(tensorboard_path(idx))
-train(model, dataset, idx)
+def train_on(layers, dataset, idx):
+    model = toy_net(layers)
+    if not os.path.exists(checkpoint_dir(idx)):
+        os.makedirs(checkpoint_dir(idx))
+    if not os.path.exists(tensorboard_path(idx)):
+        os.makedirs(tensorboard_path(idx))
+    print("training on model:{}".format(idx))
+    print(model.summary())
+    train(model, dataset, idx)
+
+
+train_on(layers, new_ds(), 1)
+train_on(layers, new_ds(), 2)
