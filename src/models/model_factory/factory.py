@@ -1,5 +1,4 @@
 class ModelFactory(object):
-
     def __init__(self):
         self._model_dict = dict()
     
@@ -40,7 +39,6 @@ class ModelRegister(object):
     def create_model():
         return Cap100()
     """
-
     def __init__(self, name):
         self.name = name.upper()
 

@@ -29,23 +29,6 @@ def toy_net(batch_size = 1):
 
     return model
 
-    # define the model
-    # input = layers.Input(shape=(input_dims,1,1000))
-    # x = input
-    # x = layers.Dense(20, activation=activa)(x)
-    # x = layers.Dense(20, activation=activa)(x)
-    # x = layers.Dense(20, activation=activa)(x)
-    # x = layers.Dense(20, activation=activa)(x)
-    # x = layers.Dense(20, activation=activa)(x)
-    # x = layers.Dense(20, activation=activa)(x)
-    # x = layers.Dense(20, activation=activa)(x)
-    # x = layers.Dense(20, activation=activa)(x)
-    # x = layers.Dense(20, activation=activa)(x)
-    # output = layers.Dense(1, activation=activa)(x)
-    
-    # return models.Model(input, output, name="toy_net")
-
-
 # @tf.function
 def train(model, dataset):
 
@@ -67,15 +50,14 @@ def train(model, dataset):
     #     gradients = tape.gradient(loss, model.trainable_variable)
     #     optimizer.apply_gradients(zip(gradients, model.trainable_variables))
 
+
+
+
 model = toy_net()
 dataset = input_fn(str(default_path / "alu_6.csv"), 16, [True for i in range(1)] + [False for i in range(4)])
-# for data in dataset:
-#     print(data)
+
+cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,
+                                                 save_weights_only=True,
+                                                 verbose=1)
+
 train(model, dataset)
-
-# start teh training
-
-
-
-
-# 
