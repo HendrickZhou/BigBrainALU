@@ -34,7 +34,7 @@ class Dataset():
                     data, label = self._get_data_label(A, B, op)
                     yield arr(data), arr(label)
 
-    def __call__(self, form = "csv", batch_size = 1000):
+    def __call__(self, form = "csv", batch_size = 1000, shuffle = False):
         if form is "csv":
             self.path = self.path + "dataset_csv/"
             self.filename = "alu_{}.csv".format(self.data_bits)
@@ -77,7 +77,7 @@ class Dataset():
             raise Exception("Illegal format type")
          
 
-    def _csv(self):
+    def _csv(self, shuffle = False):
         number, ops = self.alu.gen_range()
         datas = []
         labels = []
