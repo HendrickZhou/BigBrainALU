@@ -9,37 +9,40 @@ from tools.dataset import *
 BITS = 6
 OPS_BITS = 4
 
-def toy_net(batch_size = 1):
+checkpoint_dir = lambda idx: str(default_train_sum_path()) + "/checkpoint/model_{}/".format(idx)
+checkpoint_path = "cp-{epoch:04d}.ckpt"
+tensorboard_path = lambda idx: str(default_train_sum_path()) + "/summary/model_{}/".format(idx)
+
+def toy_net(layers, batch_size = 1):
     input_dims = 2*BITS + OPS_BITS
     output_dims = 1
-    model = keras.Sequential([
-        keras.layers.Dense(55, input_shape=(input_dims,)),
-        keras.layers.Dense(units=50, activation='relu'),
-        keras.layers.Dense(units=55, activation='relu'),
-        keras.layers.Dense(units=40, activation='relu'),
-        keras.layers.Dense(units=35, activation='relu'),
-        keras.layers.Dense(units=30, activation='relu'),
-        keras.layers.Dense(units=25, activation='relu'),
-        keras.layers.Dense(units=20, activation='relu'),
-        keras.layers.Dense(units=15, activation='relu'),
-        # keras.layers.Dense(units=10, activation='relu'),
-        # keras.layers.Dense(units=5, activation='relu'),
-        keras.layers.Dense(units=output_dims, activation='relu')
-    ])
-
+    model = keras.Sequential()
+    model.add(keras.layers.Dense(55, input_shape=(input_dims,)))
+    for unit in layers:
+        model.add(keras.layers.Dense(units=unit, activation='relu'))
+    model.add(keras.layers.Dense(units=output_dims, activation='relu'))
     return model
 
 # @tf.function
-def train(model, dataset):
-
+def train(model, dataset, idx):
+    cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_dir(idx)+checkpoint_path,
+                                                     monitor = "val_acc",
+                                                     verbose=1,
+                                                     save_best_only = True,
+                                                     save_weights_only=True,
+                                                     mode = "auto",
+                                                     save_freq=100)
+    tb_callback = tf.keras.callbacks.TensorBoard(log_dir = tensorboard_path(idx),
+                                                 update_freq = 100)
     model.compile(optimizer='adam', 
                   loss=tf.losses.MeanSquaredError(),
-                  metrics=['accuracy'])
+                  metrics=[tf.keras.metrics.BinaryAccuracy()])
 
     history = model.fit(
         dataset, 
-        steps_per_epoch = 1000,
-        epochs=50,
+        steps_per_epoch = 100, #600
+        epochs=2, # 20
+        callbacks = [cp_callback, tb_callback]
         # validation_data=val_dataset.repeat(), 
         # validation_steps=2
     )
@@ -53,11 +56,16 @@ def train(model, dataset):
 
 
 
-model = toy_net()
+
+layers = [55, 50, 40, 35, 30, 25, 10, 15]
+
+model = toy_net(layers)
 dataset = input_fn(str(default_path / "alu_6.csv"), 16, [True for i in range(1)] + [False for i in range(4)])
 
-cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,
-                                                 save_weights_only=True,
-                                                 verbose=1)
-
-train(model, dataset)
+idx = 1
+import os
+if not os.path.exists(checkpoint_dir(idx)):
+    os.makedirs(checkpoint_dir(idx))
+if not os.path.exists(tensorboard_path(idx)):
+    os.makedirs(tensorboard_path(idx))
+train(model, dataset, idx)

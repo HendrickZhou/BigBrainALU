@@ -10,6 +10,10 @@ A little notes on python path-related lib:
 import os
 import pathlib
 
+def default_train_sum_path():
+    project_path = pathlib.Path(__file__).parent.parent.parent
+    return project_path / "train_summary"
+
 def default_dataset_path():
     """
     default project/src/tools/utils.py dirctory
@@ -41,3 +45,4 @@ if __name__ == "__main__":
     # files = get_files_with_extension(default_dataset_path(), "batch")
     # print(files[:10])
     print(default_dataset_path())
+    print(str(default_train_sum_path()))
