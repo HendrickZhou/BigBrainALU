@@ -34,11 +34,11 @@ class Dataset():
                     data, label = self._get_data_label(A, B, op)
                     yield arr(data), arr(label)
 
-    def __call__(self, form = "csv", batch_size = 1000, shuffle = False):
+    def __call__(self, form = "csv", batch_size = 1000, shuffle = True):
         if form is "csv":
             self.path = self.path + "dataset_csv/"
             self.filename = "alu_{}.csv".format(self.data_bits)
-            self._csv()
+            self._csv(shuffle)
 
         elif form is "batch":
             self.path = self.path + "dataset{}".format(self.data_bits)
@@ -86,7 +86,6 @@ class Dataset():
         total_size = len(ops) * len(number)**2
         i = 0
 
-        
         for op in ops:
             for B in number:
                 for A in number:
@@ -98,7 +97,10 @@ class Dataset():
         data_arr = np.array(datas, dtype='uint8').reshape((total_size, data_dim))
         label_arr = np.array(labels, dtype = 'uint8').reshape((total_size, label_dim))
         df = pd.DataFrame(np.hstack((data_arr, label_arr)))
+        if shuffle:
+            df = df.sample(frac=1).reset_index(drop=True)
         df.to_csv(self.path + self.filename, header=False, index=False)
+
 
     def _get_data_label(self, A, B, op):
         """
