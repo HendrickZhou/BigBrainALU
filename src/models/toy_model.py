@@ -40,8 +40,8 @@ def train(model, dataset, idx):
 
     history = model.fit(
         dataset, 
-        steps_per_epoch = 100, #600
-        epochs=2, # 20
+        steps_per_epoch = 600, #600
+        epochs=20, # 20
         callbacks = [cp_callback, tb_callback]
         # validation_data=val_dataset.repeat(), 
         # validation_steps=2
