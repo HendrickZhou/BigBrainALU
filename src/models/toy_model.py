@@ -5,7 +5,7 @@ from tensorflow import keras
 import numpy as np
 from tools.utils import *
 from tools.dataset import *
-
+from capacity.cap_estimate import *
 BITS = 6
 OPS_BITS = 4
 
@@ -57,10 +57,11 @@ def new_ds():
     dataset = input_fn(str(default_path / "alu_6.csv"), 16, [True for i in range(1)] + [False for i in range(4)])
     return dataset
 
-layers = [55, 50, 40, 35, 30, 25, 10, 15]
+layers = [55, 50, 40, 35, 30, 25, 20, 15]
 import os
-def train_on(layers, dataset, idx):
+def train_on(layers,input_dim, output_dim, dataset, idx):
     model = toy_net(layers)
+    print("capacity of this dense net: {}".format(cap_estimate(layers,input_dim, output_dim)))
     if not os.path.exists(checkpoint_dir(idx)):
         os.makedirs(checkpoint_dir(idx))
     if not os.path.exists(tensorboard_path(idx)):
@@ -69,6 +70,6 @@ def train_on(layers, dataset, idx):
     print(model.summary())
     train(model, dataset, idx)
 
-
-train_on(layers, new_ds(), 1)
-train_on(layers, new_ds(), 2)
+if __name__ == "__main__":
+    train_on(layers, 16, 1, new_ds(), 1)
+    train_on(layers, 16, 1, new_ds(), 2)
