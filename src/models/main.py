@@ -31,6 +31,17 @@ for i, l in enumerate(layers):
     print("layer" + str(i))
     print(cap_estimate(l, 20, 1))
 
+cp_callback = lambda idx : tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_dir(idx)+checkpoint_path,
+                                                 monitor = "acc",
+                                                 verbose=1,
+                                                 #save_best_only = True,
+                                                 save_weights_only=True,
+                                                 mode = "auto",
+                                                 save_freq=100)
+tb_callback = lambda idx : tf.keras.callbacks.TensorBoard(log_dir = tensorboard_path(idx),
+                                                 update_freq = 100)
+
+
 
 for i, l in enumerate(layers):
-    train_on(l, 16, 1, new_ds(), i+1)
+    train_on(l, 16, 1, new_ds(True), new_ds(False), cp_callback, tb_callback, i+1)

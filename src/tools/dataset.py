@@ -33,7 +33,7 @@ def input_fn(csv_file_name,
     result = result.map(lambda *items: tf.stack(items))
     result = result.map(lambda item: split_data_label(item, args_data), num_parallel_calls=tf.data.experimental.AUTOTUNE)
     result = result.shuffle(10000).batch(1000)
-    result = result.cache().repeat().prefetch(100)
+    result = result.cache().prefetch(100)
     return result
 
 def split_data_label(element, input_len):

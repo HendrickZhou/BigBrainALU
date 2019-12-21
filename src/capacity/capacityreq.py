@@ -1,4 +1,3 @@
-from __future__ import division
 import csv
 import math
 import sys
@@ -29,19 +28,22 @@ class1=''
 
 with open(sys.argv[1],'rb') as csvfile:
     csvreader = csv.reader(csvfile) 
-    for row in csvreader:	
+    for row in csvreader:
+        if not row[:-1]:
+            continue
 	numpoints=numpoints+1
         result = 0
-	numrows=len(row[:-1])
-        for elem in row[:-1]:
+        numrows=len(row[:-7])
+#        import pdb; pdb.set_trace()
+        for elem in row[:-7]:
             result = result + float(elem) 
-	c = row[-1]
+	c = row[-7]
 	if (class1==''):
 		class1=c
 	if (c==class1):
 		numclass1=numclass1+1
 	if (rounding!=-1):
-		result=int(result*math.pow(10,rounding))//math.pow(10,rounding)
+		result=int(result*math.pow(10,rounding))/math.pow(10,rounding)
 	energies=energies+[(result, c)]
 
 
@@ -54,14 +56,14 @@ for item in sortedenergies:
 		curclass=item[1]
 
 clusters=changes+1
-mincuts=math.ceil(math.log(clusters)//math.log(2))
+mincuts=math.ceil(math.log(clusters)/math.log(2))
 capacity=mincuts*numrows
 #tmlpcap=mincuts*(numrows+1)+(mincuts+1)
 
 # The following assume two classes!
-entropy=-((float(changes)//numpoints)*math.log(float(changes)//numpoints)+(float(numpoints-changes)//numpoints)*math.log(float(numpoints-changes)//numpoints))//math.log(2)
+entropy=-((float(changes)/numpoints)*math.log(float(changes)/numpoints)+(float(numpoints-changes)/numpoints)*math.log(float(numpoints-changes)/numpoints))/math.log(2)
 
-print("Input dimensionality: ", numrows, ". Number of points:", numpoints, ". Class balance:", float(numclass1)//numpoints )
+print("Input dimensionality: ", numrows, ". Number of points:", numpoints, ". Class balance:", float(numclass1)/numpoints )
 print("Eq. energy clusters: ", clusters, "=> binary decisions/sample:", entropy)
 print("Max capacity need: ", (changes*(numrows+1))+changes,"bits")
 print("Estimated capacity need: ",int(math.ceil(capacity)),"bits")

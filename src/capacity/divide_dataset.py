@@ -20,8 +20,12 @@ def random_tag(csv_filepath, csv_name, new_name, ratio=0.7):
             train_test[i] = True 
     
     df["set"] = train_test
-    
-    df.to_csv(str(csv_filepath / new_name))
+   
+    train_set = df[df["set"] == True]
+    valid_set = df[df["set"] == False]
+    train_set.to_csv(str(csv_filepath / (new_name+"_train.csv")), header=False, index=False)
+    valid_set.to_csv(str(csv_filepath / (new_name+"_valid.csv")), header=False, index=False)
+#    df.to_csv(str(csv_filepath / new_name), header = False, index = False)
 #    print(df)
 #    train = len(df[df["set"] == True])
 #    test = len(df[df["set"] == False])
@@ -29,4 +33,4 @@ def random_tag(csv_filepath, csv_name, new_name, ratio=0.7):
 #    print(test)
 
 if __name__ == "__main__":
-    random_tag(default_path, "alu_6.csv", "alu_6_split.csv")
+    random_tag(default_path, "alu_6.csv", "alu_6", 0.85)
