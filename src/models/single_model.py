@@ -7,7 +7,7 @@ import sys
 #layers = [15,12,10,8,6] # 301
 #layers = [16, 15, 10, 9, 8, 7] #331
 #layers = [20, 15, 10 ] # 376
-layers = [40, 20 ,20, 15] # 432
+layers = [4, 4] # 432
 print(cap_estimate(layers, 15, 1))
 
 cp_callback = lambda idx : tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_dir(idx)+checkpoint_path,
@@ -23,4 +23,6 @@ tb_callback = lambda idx : tf.keras.callbacks.TensorBoard(log_dir = tensorboard_
 
 full_dataset = input_fn(str(default_path / "3ops/alu_6.csv"), 15, [True for i in range(1)] + [False for i in range(5)]).repeat()
 model_idx = sys.argv[1]
-train_on(layers, 15, 1, full_dataset, None, [cp_callback_no_valid, tb_callback_no_valid], model_idx)
+
+if len(sys.argv) <= 2:
+    train_on(layers, 15, 1, full_dataset, None, [cp_callback_no_valid, tb_callback_no_valid], model_idx)
