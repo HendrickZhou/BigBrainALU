@@ -13,6 +13,9 @@ checkpoint_dir = lambda idx: str(default_train_sum_path()) + "/checkpoint_test/m
 checkpoint_path = "cp-{epoch:04d}.ckpt"
 tensorboard_path = lambda idx: str(default_train_sum_path()) + "/summary_test/model_{}/".format(idx)
 
+checkpoint_train_path = "train_weights.{epoch:03d}.hdf5"
+checkpoint_valid_path = "valid_weights.{epoch:03d}.hdf5" #-{val_acc:.4f}
+
 def toy_net(layers, batch_size = 1):
     input_dims = 2*BITS + OPS_BITS
     output_dims = 1
@@ -24,7 +27,10 @@ def toy_net(layers, batch_size = 1):
     return model
 
 # @tf.function
-def train(model, train_set, valid_set, cp_callback, tb_callback):
+def train(model, train_set, valid_set, callbacks):
+    """
+    callbacks is list of callbacks
+    """
     model.compile(optimizer='adam', 
                   loss=tf.losses.MeanSquaredError(),
                   metrics=[tf.keras.metrics.BinaryAccuracy()])
@@ -34,16 +40,17 @@ def train(model, train_set, valid_set, cp_callback, tb_callback):
             train_set, 
             steps_per_epoch = 70, #600
             epochs=3, # 20
-            callbacks = [cp_callback, tb_callback],
+            callbacks = callbacks,
             validation_data=valid_set, 
             validation_steps=None,
+            validation_freq=1,
         )
     else:
         history = model.fit(
             train_set, 
-            steps_per_epoch = 600, #600
-            epochs=30, # 20
-            callbacks = [cp_callback, tb_callback]
+            steps_per_epoch = 70, #600
+            epochs=20, # 20
+            callbacks = callbacks,
         )
  
     # for x,y in dataset:
@@ -71,7 +78,7 @@ cp_callback_no_valid = lambda idx : tf.keras.callbacks.ModelCheckpoint(filepath=
 tb_callback_no_valid =lambda idx : tf.keras.callbacks.TensorBoard(log_dir = tensorboard_path(idx),
                                                  update_freq = 100)
 cp_callback = lambda idx : tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_dir(idx)+checkpoint_path,
-                                                 monitor = "acc",
+                                                 monitor = "val_acc",
                                                  verbose=1,
                                                  #save_best_only = True,
                                                  save_weights_only=True,
@@ -81,9 +88,32 @@ tb_callback = lambda idx : tf.keras.callbacks.TensorBoard(log_dir = tensorboard_
                                                  update_freq = 100)
 
 
+cp_callback_train_test = lambda idx: tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_dir(idx)+checkpoint_train_path,
+        moniter = "acc",
+        verbose=1,
+        save_best_only = True,
+        save_weights_only = False,
+        mode = "max",
+        save_freq="epoch")
+cp_callback_valid_test = lambda idx: tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_dir(idx)+checkpoint_valid_path,
+        moniter = "val_acc",
+        verbose=1,
+        save_best_only = True,
+        save_weights_only = False,
+        mode = "max",
+        save_freq="epoch")
+tb_callback_test = lambda idx : tf.keras.callbacks.TensorBoard(log_dir = tensorboard_path(idx),
+        histogram_freq = 10,
+        write_graph = True,
+        write_images = True,
+        update_freq = 10000)
+
+
+
+
 layers = [55, 50, 40, 35, 30, 25, 20, 15]
 import os
-def train_on(layers,input_dim, output_dim, train_set, valid_set, cp_callback, tb_callback, idx):
+def train_on(layers,input_dim, output_dim, train_set, valid_set, callbacks_fn, idx):
     model = toy_net(layers)
     print("capacity of this dense net: {}".format(cap_estimate(layers,input_dim, output_dim)))
     if not os.path.exists(checkpoint_dir(idx)):
@@ -92,8 +122,10 @@ def train_on(layers,input_dim, output_dim, train_set, valid_set, cp_callback, tb
         os.makedirs(tensorboard_path(idx))
     print("training on model:{}".format(idx))
     print(model.summary())
-    train(model, train_set, valid_set, cp_callback(idx), tb_callback(idx))
+    callbacks = [cb_fn(idx) for cb_fn in callbacks_fn]
+    train(model, train_set, valid_set, callbacks)
 
 if __name__ == "__main__":
-    train_on(layers, 16, 1, new_ds(True), new_ds(False) ,cp_callback, tb_callback, 1)
-    train_on(layers, 16, 1, new_ds(True), new_ds(False), cp_callback, tb_callback, 2)
+    callbacks = [cp_callback_train_test, cp_callback_valid_test, tb_callback_test]
+    train_on(layers, 16, 1, new_ds(True), new_ds(False), callbacks, 1)
+    train_on(layers, 16, 1, new_ds(True), new_ds(False), callbacks, 2)
