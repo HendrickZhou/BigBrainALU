@@ -53,7 +53,8 @@ def train(model, train_set, valid_set, callbacks):
     """
     callbacks is list of callbacks
     """
-    model.compile(optimizer='adam', 
+    optimizer = tf.keras.optimizers.Adam(learning_rate=0.01)
+    model.compile(optimizer=optimizer, 
                   loss=tf.losses.MeanSquaredError(),
                   metrics=[tf.keras.metrics.BinaryAccuracy()])
 
@@ -70,8 +71,8 @@ def train(model, train_set, valid_set, callbacks):
     else:
         history = model.fit(
             train_set, 
-            steps_per_epoch = 70, #600
-            epochs=50, # 20
+            steps_per_epoch = 100, #600
+            epochs=100, # 20
             callbacks = callbacks,
         )
  

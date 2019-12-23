@@ -30,7 +30,7 @@ layers = [layers_1, layers_2, layers_3, layers_4, layers_5, layers_6, layers_7, 
 # capacity
 for i, l in enumerate(layers):
     print("layer" + str(i))
-    print(cap_estimate(l, 20, 1))
+    print(cap_estimate(l, 16, 1))
 
 cp_callback = lambda idx : tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_dir(idx)+checkpoint_path,
                                                  monitor = "acc",

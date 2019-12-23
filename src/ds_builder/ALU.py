@@ -45,25 +45,25 @@ class ALU:
 
     """
 
-    def __init__(self, num_bit = 8, op_code_list = ['ad', 'ac', 'su', 'mul', 'muh', 'd', 'r', 'a', 'o', 'x', 'lsl','lsr', 'ror', 'rol']):
+    def __init__(self, num_bit = 6, op_code_list = ['ad', 'ac', 'su', 'mul', 'a', 'o', 'x']):
         self.op_dict = {
             'ad' : self.ADD,
             'ac' : self.ADDC,
             'su' : self.SUB,
             'mul' : self.MUL,
-            'muh' : self.MUH,
-            'd' : self.DIV,
-            'r' : self.REMU,
+            #'muh' : self.MUH,
+            #'d' : self.DIV,
+            #'r' : self.REMU,
             # 'sub' : self.SUBB,
             'a' : self.AND,
             'o' : self.OR,
             'x' : self.XOR,
 
-            'lsl' : self.LSL,
-            'lsr' : self.LSR,
+            #'lsl' : self.LSL,
+            #'lsr' : self.LSR,
 
-            'ror' : self.ROR,
-            'rol' : self.ROL,
+            #'ror' : self.ROR,
+            #'rol' : self.ROL,
         }
         self.bits = num_bit
         self.op_code_list = op_code_list

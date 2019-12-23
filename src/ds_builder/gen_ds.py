@@ -15,7 +15,7 @@ class Dataset():
         self.data_bits = data_bits
         self.label_bit_msk = [i!=0 for i in label_bit_msk]
         
-        self.alu = ALU(self.data_bits)
+        self.alu = ALU(self.data_bits, ['x'])
         self.data_dim = self.alu.data_dim
         self.label_dim = min(self.alu.label_dim, sum(self.label_bit_msk))
         self.filename = str()
@@ -36,8 +36,8 @@ class Dataset():
 
     def __call__(self, form = "csv", batch_size = 1000, shuffle = True):
         if form is "csv":
-            self.path = self.path + "dataset_csv/"
-            self.filename = "alu_{}.csv".format(self.data_bits)
+            self.path = self.path + "dataset_csv/3ops/"
+            self.filename = "xor_{}.csv".format(self.data_bits)
             self._csv(shuffle)
 
         elif form is "batch":
@@ -81,7 +81,7 @@ class Dataset():
         number, ops = self.alu.gen_range()
         datas = []
         labels = []
-        data_dim = self.alu.data_dim
+        data_dim = self.alu.data_dim-1
         label_dim = self.label_dim
         total_size = len(ops) * len(number)**2
         i = 0
@@ -107,7 +107,7 @@ class Dataset():
         return the list of data and label
         """
         in1, in2, opc, out = self.alu(A, B, op)
-        data = list(in1) + list(in2) + list(opc)
+        data = list(in1) + list(in2)# + list(opc)
         label = list(out)
         label = [i for i,j in zip(label, self.label_bit_msk) if j]
         return data, label  
