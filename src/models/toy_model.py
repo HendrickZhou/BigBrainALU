@@ -11,7 +11,7 @@ OPS_BITS = 3
 
 checkpoint_dir = lambda idx: str(default_train_sum_path()) + "/checkpoint_part1/model_{}/".format(idx)
 tensorboard_path = lambda idx: str(default_train_sum_path()) + "/summary_part1/model_{}/".format(idx)
-checkpoint_path = "cp-{epoch:04d}.ckpt"
+checkpoint_path = "cp-{epoch:04d}.hdf5"
 checkpoint_train_path = "train-{epoch:03d}.hdf5"
 checkpoint_valid_path = "valid-{epoch:03d}.hdf5" #-{val_acc:.4f}
 
