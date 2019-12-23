@@ -7,7 +7,7 @@ from tools.utils import *
 from tools.dataset import *
 from capacity.cap_estimate import *
 BITS = 6
-OPS_BITS = 4
+OPS_BITS = 3
 
 checkpoint_dir = lambda idx: str(default_train_sum_path()) + "/checkpoint_part1/model_{}/".format(idx)
 tensorboard_path = lambda idx: str(default_train_sum_path()) + "/summary_part1/model_{}/".format(idx)
@@ -26,8 +26,8 @@ def toy_net(layers, batch_size = 1):
     input_dims = 2*BITS + OPS_BITS
     output_dims = 1
     model = keras.Sequential()
-    model.add(keras.layers.Dense(55, input_shape=(input_dims,)))
-    for unit in layers:
+    model.add(keras.layers.Dense(layers[0], input_shape=(input_dims,)))
+    for unit in layers[1:]:
         model.add(keras.layers.Dense(units=unit, activation='relu'))
     model.add(keras.layers.Dense(units=output_dims, activation='relu'))
     return model
@@ -38,7 +38,7 @@ def toy_net(layers, batch_size = 1):
 ################
 def new_ds(train = True):
     if train:
-        dataset = input_fn(str(default_path / "alu_6_valid.csv"), 16, [True for i in range(1)] + [False for i in range(5)])
+        dataset = input_fn(str(default_path / "3ops/alu_6.csv"), 16, [True for i in range(1)] + [False for i in range(5)])
         dataset = dataset.repeat()
     else:
         dataset = input_fn(str(default_path / "alu_6_valid.csv"), 16, [True for i in range(1)] + [False for i in range(5)])
@@ -53,7 +53,7 @@ def train(model, train_set, valid_set, callbacks):
     """
     callbacks is list of callbacks
     """
-    optimizer = tf.keras.optimizers.Adam(learning_rate=0.01)
+    optimizer = tf.keras.optimizers.Adam(learning_rate=0.001)
     model.compile(optimizer=optimizer, 
                   loss=tf.losses.MeanSquaredError(),
                   metrics=[tf.keras.metrics.BinaryAccuracy()])
@@ -61,8 +61,8 @@ def train(model, train_set, valid_set, callbacks):
     if valid_set:
         history = model.fit(
             train_set, 
-            steps_per_epoch = 70, #600
-            epochs=30, # 20
+            steps_per_epoch = 50, #600
+            epochs=50, # 20
             callbacks = callbacks,
             validation_data=valid_set, 
             validation_steps=None,
@@ -71,7 +71,7 @@ def train(model, train_set, valid_set, callbacks):
     else:
         history = model.fit(
             train_set, 
-            steps_per_epoch = 100, #600
+            steps_per_epoch = 50, #600
             epochs=100, # 20
             callbacks = callbacks,
         )

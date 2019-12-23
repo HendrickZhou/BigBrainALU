@@ -33,11 +33,11 @@ with open(sys.argv[1],'rb') as csvfile:
             continue
 	numpoints=numpoints+1
         result = 0
-        numrows=len(row[:-7])
+        numrows=len(row[:-6])
 #        import pdb; pdb.set_trace()
-        for elem in row[:-7]:
+        for elem in row[:-6]:
             result = result + float(elem) 
-	c = row[-7]
+	c = row[-6]
 	if (class1==''):
 		class1=c
 	if (c==class1):
