@@ -1,6 +1,7 @@
 import tensorflow as tf
 from capacity.cap_estimate import *
 from .toy_model import *
+from tools.dataset import *
 
 # layers
 
@@ -42,6 +43,6 @@ tb_callback = lambda idx : tf.keras.callbacks.TensorBoard(log_dir = tensorboard_
                                                  update_freq = 100)
 
 
-
+full_dataset = input_fn(str(default_path / "alu_6.csv"), 16, [True for i in range(1)] + [False for i in range(5)]).repeat()
 for i, l in enumerate(layers):
-    train_on(l, 16, 1, new_ds(True), new_ds(False), cp_callback, tb_callback, i+1)
+    train_on(l, 16, 1, full_dataset, None, [cp_callback_no_valid, tb_callback_no_valid], i+1)

@@ -9,14 +9,13 @@ from capacity.cap_estimate import *
 BITS = 6
 OPS_BITS = 4
 
-checkpoint_dir = lambda idx: str(default_train_sum_path()) + "/checkpoint_test/model_{}/".format(idx)
+checkpoint_dir = lambda idx: str(default_train_sum_path()) + "/checkpoint_part1/model_{}/".format(idx)
+tensorboard_path = lambda idx: str(default_train_sum_path()) + "/summary_part1/model_{}/".format(idx)
 checkpoint_path = "cp-{epoch:04d}.ckpt"
-tensorboard_path = lambda idx: str(default_train_sum_path()) + "/summary_test/model_{}/".format(idx)
-
 checkpoint_train_path = "train-{epoch:03d}.hdf5"
 checkpoint_valid_path = "valid-{epoch:03d}.hdf5" #-{val_acc:.4f}
 
-model_saved_path = str(default_train_sum_path()) + "/models_test/"
+model_saved_path = str(default_train_sum_path()) + "/models_part1/"
 model_saved_name = lambda idx: model_saved_path + "model_{}.h5".format(idx)
 
 
@@ -39,7 +38,7 @@ def toy_net(layers, batch_size = 1):
 ################
 def new_ds(train = True):
     if train:
-        dataset = input_fn(str(default_path / "alu_6_train.csv"), 16, [True for i in range(1)] + [False for i in range(5)])
+        dataset = input_fn(str(default_path / "alu_6_valid.csv"), 16, [True for i in range(1)] + [False for i in range(5)])
         dataset = dataset.repeat()
     else:
         dataset = input_fn(str(default_path / "alu_6_valid.csv"), 16, [True for i in range(1)] + [False for i in range(5)])
@@ -62,7 +61,7 @@ def train(model, train_set, valid_set, callbacks):
         history = model.fit(
             train_set, 
             steps_per_epoch = 70, #600
-            epochs=2, # 20
+            epochs=30, # 20
             callbacks = callbacks,
             validation_data=valid_set, 
             validation_steps=None,
@@ -72,7 +71,7 @@ def train(model, train_set, valid_set, callbacks):
         history = model.fit(
             train_set, 
             steps_per_epoch = 70, #600
-            epochs=20, # 20
+            epochs=50, # 20
             callbacks = callbacks,
         )
  
@@ -80,20 +79,20 @@ cp_callback_no_valid = lambda idx : tf.keras.callbacks.ModelCheckpoint(filepath=
                                                  monitor = "acc",
                                                  verbose=1,
                                                  #save_best_only = True,
-                                                 save_weights_only=True,
+                                                 save_weights_only=False,
                                                  mode = "auto",
-                                                 save_freq=100)
+                                                 save_freq="epoch")
 tb_callback_no_valid =lambda idx : tf.keras.callbacks.TensorBoard(log_dir = tensorboard_path(idx),
-                                                 update_freq = 100)
+                                                 update_freq = 10000)
 cp_callback = lambda idx : tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_dir(idx)+checkpoint_path,
                                                  monitor = "val_acc",
                                                  verbose=1,
                                                  #save_best_only = True,
                                                  save_weights_only=True,
                                                  mode = "auto",
-                                                 save_freq=100)
+                                                 save_freq="epoch")
 tb_callback = lambda idx : tf.keras.callbacks.TensorBoard(log_dir = tensorboard_path(idx),
-                                                 update_freq = 100)
+                                                 update_freq = 10000)
 
 
 cp_callback_train_test = lambda idx: tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_dir(idx)+checkpoint_train_path,
