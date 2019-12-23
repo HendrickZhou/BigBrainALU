@@ -62,7 +62,7 @@ def train(model, train_set, valid_set, callbacks):
         history = model.fit(
             train_set, 
             steps_per_epoch = 50, #600
-            epochs=50, # 20
+            epochs=300, # 20
             callbacks = callbacks,
             validation_data=valid_set, 
             validation_steps=None,
@@ -115,7 +115,7 @@ tb_callback_test = lambda idx : tf.keras.callbacks.TensorBoard(log_dir = tensorb
         write_graph = True,
         write_images = True,
         update_freq = 10000)
-val_callbacks = [cp_callback_train_test,cp_callback_valid_test, tb_callback_test]
+val_callbacks = [cp_callback_valid_test, tb_callback_test]
 
 
 #############

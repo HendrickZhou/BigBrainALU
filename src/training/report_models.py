@@ -34,10 +34,10 @@ if __name__ == "__main__":
     model_idx = sys.argv[1]
     cp_idx = sys.argv[2]
     model_1 = restore(model_saved_name(model_idx), checkpoint_dir(model_idx)+checkpoint_valid_path(cp_idx))
-    #model_2 = restore(model_saved_name(2), checkpoint_dir(2)+checkpoint_train_path)
     full_dataset = input_fn(str(default_path / "3ops/alu_6.csv"), 15, [True for i in range(1)] + [False for i in range(5)])
     valid_set = new_ds(False)
-    loss, acc = model_1.evaluate(full_dataset, verbose = 2)
+    train_set = input_fn(str(default_path / "3ops/alu_6_train.csv"), 15, [True for i in range(1)] + [False for i in range(5)])
+    loss, acc = model_1.evaluate(train_set, verbose = 0)
     print("Restored model, training accuracy: {:5.2f}%".format(100*acc))
-    loss, acc = model_1.evaluate(valid_set, verbose = 2)
+    loss, acc = model_1.evaluate(valid_set, verbose = 0)
     print("Restored model, valid accuracy: {:5.2f}%".format(100*acc))
