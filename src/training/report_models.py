@@ -5,14 +5,14 @@ from models.toy_model import new_ds
 from capacity.cap_estimate import *
 import sys
 
-checkpoint_dir = lambda idx: str(default_train_sum_path()) + "/checkpoint_part1/model_{}/".format(idx)
-tensorboard_path = lambda idx: str(default_train_sum_path()) + "/summary_part1/model_{}/".format(idx)
+checkpoint_dir = lambda idx: str(default_train_sum_path()) + "/checkpoint_part2/model_{}/".format(idx)
+tensorboard_path = lambda idx: str(default_train_sum_path()) + "/summary_part2/model_{}/".format(idx)
 
-checkpoint_train_path = "train-100.hdf5"
-checkpoint_valid_path = "valid-100.hdf5"
+checkpoint_train_path = lambda x:"train-{}.hdf5".format(x)
+checkpoint_valid_path = lambda x:"valid-{}.hdf5".format(x)
 checkpoint_no_valid = lambda x: "cp-0{}.hdf5".format(x)
 
-model_saved_path = str(default_train_sum_path()) + "/models_part1/"
+model_saved_path = str(default_train_sum_path()) + "/models_part2/"
 model_saved_name = lambda idx: model_saved_path + "model_{}.h5".format(idx)
 
 def restore(model_path, checkpoints_path):
@@ -33,8 +33,11 @@ def evaluate(model, ds):
 if __name__ == "__main__":
     model_idx = sys.argv[1]
     cp_idx = sys.argv[2]
-    model_1 = restore(model_saved_name(model_idx), checkpoint_dir(model_idx)+checkpoint_no_valid(cp_idx))
+    model_1 = restore(model_saved_name(model_idx), checkpoint_dir(model_idx)+checkpoint_valid_path(cp_idx))
     #model_2 = restore(model_saved_name(2), checkpoint_dir(2)+checkpoint_train_path)
     full_dataset = input_fn(str(default_path / "3ops/alu_6.csv"), 15, [True for i in range(1)] + [False for i in range(5)])
+    valid_set = new_ds(False)
     loss, acc = model_1.evaluate(full_dataset, verbose = 2)
-    print("Restored model, accuracy: {:5.2f}%".format(100*acc))
+    print("Restored model, training accuracy: {:5.2f}%".format(100*acc))
+    loss, acc = model_1.evaluate(valid_set, verbose = 2)
+    print("Restored model, valid accuracy: {:5.2f}%".format(100*acc))

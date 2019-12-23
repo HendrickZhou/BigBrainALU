@@ -21,8 +21,10 @@ def random_tag(csv_filepath, csv_name, new_name, ratio=0.7):
     
     df["set"] = train_test
    
-    #train_set = df[df["set"] == True]
-    #valid_set = df[df["set"] == False]
+    train_set = df[df["set"] == True]
+    valid_set = df[df["set"] == False]
+    train_set.drop('set', inplace=True, axis=1)
+    valid_set.drop('set', inplace=True, axis=1)
     train_set.to_csv(str(csv_filepath / (new_name+"_train.csv")), header=False, index=False)
     valid_set.to_csv(str(csv_filepath / (new_name+"_valid.csv")), header=False, index=False)
 #    df.to_csv(str(csv_filepath / new_name), header = False, index = False)
