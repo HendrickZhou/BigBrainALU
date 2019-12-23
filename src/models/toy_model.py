@@ -72,7 +72,7 @@ def train(model, train_set, valid_set, callbacks):
         history = model.fit(
             train_set, 
             steps_per_epoch = 50, #600
-            epochs=100, # 20
+            epochs=300, # 20
             callbacks = callbacks,
         )
  
