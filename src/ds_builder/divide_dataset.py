@@ -21,8 +21,8 @@ def random_tag(csv_filepath, csv_name, new_name, ratio=0.7):
     
     df["set"] = train_test
    
-    train_set = df[df["set"] == True]
-    valid_set = df[df["set"] == False]
+    #train_set = df[df["set"] == True]
+    #valid_set = df[df["set"] == False]
     train_set.to_csv(str(csv_filepath / (new_name+"_train.csv")), header=False, index=False)
     valid_set.to_csv(str(csv_filepath / (new_name+"_valid.csv")), header=False, index=False)
 #    df.to_csv(str(csv_filepath / new_name), header = False, index = False)
@@ -32,5 +32,11 @@ def random_tag(csv_filepath, csv_name, new_name, ratio=0.7):
 #    print(train)
 #    print(test)
 
+def measure_conv(csv_filepath, csv_name):
+    """
+    measure if the dataset division converges
+    """
+    pass
+
 if __name__ == "__main__":
-    random_tag(default_path, "alu_6.csv", "alu_6", 0.85)
+    random_tag(default_path/"3ops", "alu_6.csv", "alu_6", 0.85)

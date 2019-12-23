@@ -20,17 +20,28 @@ if (len(sys.argv)==1) or (len(sys.argv)>3):
 	print()
 	sys.exit()
 
-if (len(sys.argv)>2):
-	rounding=int(sys.argv[2])
-	print("Significant digits: ",rounding)
-
+#if (len(sys.argv)>2):
+#	rounding=int(sys.argv[2])
+#	print("Significant digits: ",rounding)
+ratio = float(sys.argv[2])
 class1=''
+with open(sys.argv[1], 'rb') as csvfile:
+    csvreader = csv.reader(csvfile)
+    row_count = sum(1 for row in csvreader)
+    print(str(row_count) + "rows total")
+
+print str(ratio*row_count)
 
 with open(sys.argv[1],'rb') as csvfile:
-    csvreader = csv.reader(csvfile) 
+    csvreader = csv.reader(csvfile)
+    counter=0
     for row in csvreader:
-        if not row[:-1]:
-            continue
+        #if not row[:-1]:
+        #   continue
+        if counter > ratio* row_count:
+            print("stop at " +str(counter) +" rows" )
+            break
+        counter = counter+1
 	numpoints=numpoints+1
         result = 0
         numrows=len(row[:-6])
