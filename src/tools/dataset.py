@@ -75,6 +75,6 @@ if __name__ == "__main__":
         for data, label in dataset:
             tf.print(data, output_stream=sys.stdout)
             tf.print(label, output_stream=sys.stdout)
-
+    import pdb; pdb.set_trace()
     extract_dataset(dataset)
     print("done running")

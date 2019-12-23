@@ -1,18 +1,16 @@
 import tensorflow as tf
-
+from tensorflow.keras.activations import relu
 
 class GadgetAnd:
     def __init__(self, trainable = False):
         if not trainable:
-            #self.W1 = [[1, 1]]
-            #self.b1 = [[]]
-            #self.W2 = 
-            #self.b2 = 
-            pass
+            self.W = tf.constant([[1.0], [1.0]], dtype=tf.float32)
+            self.b = tf.constant([-1.0], dtype=tf.float32)
         else:
+            initializer = tf.initializers.GlorotNormal()
             # init to random weights
-            pass
-
+            self.W = tf.Variable(initializer([2, 1]))
+            self.b = tf.Variable(tf.zeros([1], dtype = tf.float32))
     def __call__(self, X):
         """
         0---0
@@ -21,23 +19,55 @@ class GadgetAnd:
         """
         return self._cell(X)
 
-    @tf.function
+    @tf.function(input_signature=(
+        tf.TensorSpec(shape=[None, 2], dtype=tf.float32),)
+    )
     def _cell(self, X):
-        H = X*self.W1 + self.b1
-        return H*self.W2 + self.b2
-
-        
-
+        H = X@self.W + self.b
+        return relu(H)
+    
 class GadgetOr:
-    def __init__(self):
-        pass
+    def __init__(self, trainable = False):
+        if not trainable:
+            self.W = tf.constant([[1.0],[1.0]], dtype=tf.float32)
+            self.b = tf.constant([0.0], dtype=tf.float32)
+        else:
+            pass
 
+    def __call__(self, X):
+        """
+        """
+        return self._cell(X)
+
+    @tf.function(input_signature=(
+        tf.TensorSpec(shape=[None, 2], dtype=tf.float32),)
+    )
+    def _cell(self, X):
+        H = X@self.W + self.b
+        return relu(H)    
 
 class GadgetXor:
-    def __init__(self):
-        pass
+    def __init__(self, trainable = False):
+        if not trainable:
+            self.W_1 = tf.constant([[1.], [1.]], dtype=tf.float32)
+            self.b_1 = tf.constant([-1.5], dtype=tf.float32)
+            self.W_skip = tf.constant([[1.], [1.]], dtype=tf.float32)
+            self.b_2 = tf.constant([-0.5], dtype=tf.float32)
+            self.W_2 = tf.constant([[-3.0]], dtype = tf.float32)
+        else:
+            pass
+
+    def __call__(self, X):
+        return self._cell(X)
+    @tf.function(input_signature=(
+        tf.TensorSpec(shape=[None, 2], dtype=tf.float32),)
+    )
+    def _cell(self, X):
+        H = relu(X@self.W_1 + self.b_1)
+        return relu(X@self.W_skip + H@self.W_2 + self.b_2)
 
 if __name__ == "__main__":
-    and_layer = GadgetAnd()
-    print(and_layer([[1,0]]))
+    and_layer = GadgetAnd(True)
+    input = tf.Variable([[1,0]], dtype=tf.float32)
+    print(and_layer(input))
 
