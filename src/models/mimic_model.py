@@ -1,7 +1,9 @@
 import tensorflow as tf
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.losses import BinaryCrossentropy
-import numpy as np
+from models.gadget import *
+from tools.dataset import *
+from tools.utils import *
 
 class LogicOps:
     def __init__(self, ops, nbits, pretrained):
@@ -11,9 +13,9 @@ class LogicOps:
         pretrained: use the weight pre-calculated, the net would be untrainable
         """
         models = [self.n_AND, self.n_OR, self.n_XOR]
-        if ops is not in [1,2,3]:
+        if ops not in [1,2,3]:
             raise Exception("Illegal ops type, use 1,2,3")
-        self.model = models[ops+1]
+        self.model = models[ops-1]
         self.bits = nbits
         self.pretrained = pretrained
         self._init_train_params()
@@ -30,9 +32,21 @@ class LogicOps:
         #for _ in epoches:
         #    self.train_step()
         #    self.valid_step()
+        if self.pretrained:
+            pass
+        else:
+            self.train()
 
         
-    
+    @tf.function
+    def train(self):
+        for x, y in self.train_set:
+            with tf.GradientTape() as tape:
+                prediction = self.model(x)
+                loss = self.loss(prediction, y)
+            gradients = tape.gradient(loss, model.trainable_variables)
+            self.optimizer.apply_gradients(zip(gradients, model.trainable_variables))
+
     def _init_train_params(self):
         self.optimizer = Adam()
         self.loss = BinaryCrossentropy()
@@ -45,7 +59,7 @@ class LogicOps:
     def optimizer(self):
         return self.optimizer
 
-    @property.setter
+    @optimizer.setter
     def optimizer(self, optimizer):
         """
         you need to set the params of optimizer yourself
@@ -56,7 +70,7 @@ class LogicOps:
     def loss(self):
         return self.loss
     
-    @propety.setter
+    @loss.setter
     def loss(self, loss_fn):
         """
         accept the keras loss func, or custom func
@@ -71,4 +85,28 @@ class LogicOps:
     @tf.function
     def valid_step(self):
         pass
+    
+    #@tf.function(input_signature=(
+    #    tf.TensorSpec(shape=[None, 2*self.bits], dtype=tf.float32),)
+    #)
+    #def n_AND(self, data):
+    #    out = []
+    #    for i in range(self.bits):
+    #        and_cell = GadgetAnd(not self.pretrained)
+    #        bitsadd = data[:, i:self.nbits:i+self.nbits+1]
+    #        out.append(and_cell(bitsadd))
+    #    return tf.stack(out, axis = 0) # should output (None, 1)
+        
+
+
+if __name__ == "__name__":
+    mimic_file_path = default_
+    def get_dataset(bits):
+        dataset = input_fn(str(), bits, [True for _ in range(bits)])
+
+
+
+    LN = LogicOps(1,2, False)
+    LN()
+
 

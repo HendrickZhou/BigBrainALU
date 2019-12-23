@@ -9,9 +9,9 @@ from capacity.cap_estimate import *
 BITS = 6
 OPS_BITS = 4
 
-checkpoint_dir = lambda idx: str(default_train_sum_path()) + "/checkpoint_2/model_{}/".format(idx)
+checkpoint_dir = lambda idx: str(default_train_sum_path()) + "/checkpoint_test/model_{}/".format(idx)
 checkpoint_path = "cp-{epoch:04d}.ckpt"
-tensorboard_path = lambda idx: str(default_train_sum_path()) + "/summary_2/model_{}/".format(idx)
+tensorboard_path = lambda idx: str(default_train_sum_path()) + "/summary_test/model_{}/".format(idx)
 
 def toy_net(layers, batch_size = 1):
     input_dims = 2*BITS + OPS_BITS
@@ -32,8 +32,8 @@ def train(model, train_set, valid_set, cp_callback, tb_callback):
     if valid_set:
         history = model.fit(
             train_set, 
-            steps_per_epoch = 600, #600
-            epochs=30, # 20
+            steps_per_epoch = 70, #600
+            epochs=3, # 20
             callbacks = [cp_callback, tb_callback],
             validation_data=valid_set, 
             validation_steps=None,
