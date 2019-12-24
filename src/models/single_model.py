@@ -7,7 +7,7 @@ import sys
 #layers = [15,12,10,8,6] # 301
 #layers = [16, 15, 10, 9, 8, 7] #331
 #layers = [20, 15, 10 ] # 376
-layers = [50,55,20, 15] # 432
+layers = [5, 5] # 432
 print(cap_estimate(layers, 15, 1))
 
 cp_callback = lambda idx : tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_dir(idx)+checkpoint_path,
