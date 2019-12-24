@@ -41,4 +41,4 @@ def measure_conv(csv_filepath, csv_name):
     pass
 
 if __name__ == "__main__":
-    random_tag(default_path/"3ops", "alu_6.csv", "alu_6", 0.85)
+    random_tag(default_path/"3ops", "mul_6.csv", "mul_6", 0.75)

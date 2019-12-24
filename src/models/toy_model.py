@@ -7,15 +7,15 @@ from tools.utils import *
 from tools.dataset import *
 from capacity.cap_estimate import *
 BITS = 6
-OPS_BITS = 3
+OPS_BITS = 0
 
-checkpoint_dir = lambda idx: str(default_train_sum_path()) + "/checkpoint_part2/model_{}/".format(idx)
-tensorboard_path = lambda idx: str(default_train_sum_path()) + "/summary_part2/model_{}/".format(idx)
+checkpoint_dir = lambda idx: str(default_train_sum_path()) + "/checkpoint_part3/model_{}/".format(idx)
+tensorboard_path = lambda idx: str(default_train_sum_path()) + "/summary_part3/model_{}/".format(idx)
 checkpoint_path = "cp-{epoch:04d}.hdf5"
 checkpoint_train_path = "train-{epoch:03d}.hdf5"
 checkpoint_valid_path = "valid-{epoch:03d}.hdf5" #-{val_acc:.4f}
 
-model_saved_path = str(default_train_sum_path()) + "/models_part2/"
+model_saved_path = str(default_train_sum_path()) + "/models_part3/"
 model_saved_name = lambda idx: model_saved_path + "model_{}.h5".format(idx)
 
 
@@ -42,6 +42,15 @@ def new_ds(train = True):
         dataset = dataset.repeat()
     else:
         dataset = input_fn(str(default_path / "3ops/alu_6_valid.csv"), 15, [True for i in range(1)] + [False for i in range(5)])
+    return dataset
+
+def op_ds(ops="and", train = True):
+    if train:
+        dataset = input_fn(str(default_path / "3ops/{}_6_train.csv".format(ops)), 12, [True for i in range(1)] + [False for i in range(5)])
+        dataset = dataset.repeat()
+    else:
+        dataset = input_fn(str(default_path / "3ops/{}_6_valid.csv".format(ops)), 12, [True for i in range(1)] + [False for i in range(5)])
+
     return dataset
 
 
@@ -115,7 +124,7 @@ tb_callback_test = lambda idx : tf.keras.callbacks.TensorBoard(log_dir = tensorb
         write_graph = True,
         write_images = True,
         update_freq = 10000)
-val_callbacks = [cp_callback_valid_test, tb_callback_test]
+val_callbacks = [cp_callback_valid_test, cp_callback_train_test, tb_callback_test]
 
 
 #############
